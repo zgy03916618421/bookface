@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,maxmum-scale=1,minimum-scale=1,user-scalable=no"/>
+    <title>选择题</title>
+    <!--<link rel="stylesheet" href="/css/style.css">-->
+    <style>
+        * {
+            margin: 0;
+        }
+        body, canvas, div , a{
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -khtml-user-select: none;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        a {
+            text-decoration: none;
+        }
+        a:link,a:visited,a:hover,a:active {
+        }
+
+        body {
+            background: url("/img/bg.png") no-repeat;
+            background-size: 100%;
+        }
+
+        .begin {
+            position: absolute;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+        }
+        .part {
+            display: none;
+            position: absolute;
+            margin: 60px auto 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .part p {
+            margin: 0 auto;
+            max-width: 400px;
+            line-height: 28px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .main p {
+            margin: 15px auto 0;
+            line-height: 24px;
+            font-size: 16px;
+            text-align: left;
+            padding: 15px 20px;
+        }
+
+
+        .choose {
+            background: #fff;
+            border-bottom-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .title-index:before, .title-index:after {
+            margin: 0 5px;
+            content: '-';
+        }
+
+        #result-title {
+            color: #fff;
+            font-size: 28px;
+            line-height: 28px;
+            padding: 0 20px;
+        }
+        #result-text {
+            color: #fff;
+            font-size: 16px;
+            line-height: 28px;
+            padding: 0 20px;
+        }
+
+        .hov:hover {
+            background: #BEF3FF!important;
+        }
+
+
+    </style>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body onload='show()'>
+
+    <div style="display: block;" class="part begin">
+        <img src="/img/logo.png" style="width: 100px;margin: 0 0 50px;" />
+        <p style="color: #fff;">无论你是幸存派、拯救派、降临派</p>
+        <p style="color: #fff;">还是来自三体或者其它任何星系</p>
+        <p style="color: #fff;">这份测试将关系到人类的生死存亡</p>
+        <p style="color: #fff;">......</p>
+        <p style="color: #fff;">如果没有想好</p>
+        <p style="color: #fff;">请不要回答、不要回答、不要回答</p>
+        <div id="begin" style="margin: 90px auto 20px;padding: 0 20px;display: none;">
+            <p class="hov" style="background: #fff;border-radius: 5px;line-height: 44px;font-size: 16px;">开始</p>
+        </div>
+    </div>
+
+    <% for(var i = 0;i < items.length;i++) {%>
+        <div index="<%= items[i].index %>" class="part main part-<%= i %>">
+            <p class="title-index" style="color: #fff;font-size: 32px;line-height: 32px;text-align: center;margin: 0 auto;padding: 0;"><%= i+1 %></p>
+            <p style="color: #fff;margin-top: 0;padding-top: 5px;padding-bottom: 20px;text-align: center;line-height: 36px;"><%= items[i].question %></p>
+            <p class="choose hov" value="a"><%= items[i].options[0] %></p>
+            <p class="choose hov" value="b"><%= items[i].options[1] %></p>
+            <p class="choose hov" value="c"><%= items[i].options[2] %></p>
+            <p class="choose hov" value="d"><%= items[i].options[3] %></p>
+        </div>
+    <% } %>
+
+
+
+
+    <div class="part result">
+        <p style="margin-bottom: 30px;margin-top: 70px;" id="result-title"></p>
+        <p style="margin-bottom: 50px;" id="result-text"></p>
+        <p class="hov" style="background: #fff;padding: 13px 0;margin-bottom: 20px;border-radius: 5px;font-size: 16px;" id="again">再来</p>
+        <p class="hov" style="background: #fff;padding: 13px 0;margin-bottom: 20px;border-radius: 5px;font-size: 16px;" id="share">分享</p>
+    </div>
+
+
+
+
+    <div id="mask" style="position: absolute;width: 100%;height: 100%;background: rgba(29,39,59,0.98);text-align: center;box-sizing: border-box;display: none;">
+        <img style="height: 50%;position: absolute;right: 0;top: 0;" src="/img/share_arrow.png" />
+        <div style="position: absolute;top: 40%;width: 100%;">
+            <img style="width: 42px;margin-bottom: 20px;" src="/img/end_logo.png" />
+            <p style="color: #fff;line-height: 30px;">整个宇宙为你闪烁</p>
+            <p style="color: #fff;line-height: 30px;">快告诉你的小伙伴</p>
+        </div>
+    </div>
+
+
+
+
+<script>
+    var n = '<%= n %>';
+
+    var score = 0;
+    var current = 0;
+    var title = [
+            '只答对了 0 题',
+            '只答对了 1 题',
+            '只答对了 2 题',
+            '答对了 3 题',
+            '答对了 4 题',
+            '答对了 5 题',
+            '答对了 6 题',
+            '答对了 7 题',
+            '恭喜你答对了 8 题',
+            '恭喜你答对了 9 题',
+            '恭喜你答对了全部问题'
+    ];
+    var result = [
+            '虽然你击败了全国'+n+'名对手,但遭遇二向箔打击，整个太阳系即将二维化。再来一次，也许命运可以改写！！',
+            '虽然你击败了全国'+n+'名对手,但地球将会毁灭，倒计时3.2.1........再来一次，也许命运可以改写！！',
+            '虽然你击败了全国'+n+'名对手,但乘坐的万有引力号被击落。再来一次，也许命运可以改写！！',
+            '你击败了全国'+n+'名对手,成为了蓝色空间号上的一员，外到外太空开拓新文明。再来一次，也许命运可以改写！！',
+            '你击败了全国'+n+'名对手,获得登上“星环”号飞抵恒星DX3906的机会。去告诉你的小伙伴吧！！',
+            '你击败了全国'+n+'名对手,依靠过人的智慧，成功击退三体人，避免地球坐标暴露，拯救了全人类! 去告诉你的小伙伴吧！！'
+    ];
+    var share = [
+        '我虽然击败了全国'+n+'名对手,但暴露了地球的坐标，太阳系将受到二向箔打击，即将毁灭，快来帮我！！！',
+        '我虽然击败了全国'+n+'名对手,但暴露了地球的坐标，太阳系将受到二向箔打击，即将毁灭，快来帮我！！！',
+        '我虽然击败了全国'+n+'名对手,但乘坐的万有引力号不幸被击落，快来帮我！！！',
+        '我依靠过人的智慧击败'+n+'名对手，成为蓝色空间号上的一员，将去开拓新文明！！！',
+        '我依靠过人的智慧击败'+n+'名对手，成功登上了人类第一艘光速飞船，逃离太阳系！！！',
+        '我依靠过人的智慧击败'+n+'名对手，成功击退三体人避免地球坐标暴露，拯救了全人类！！！'
+    ];
+    $('#begin').on('click',function(){
+        $('.begin').fadeOut(500);
+        $('.part-0').fadeIn(500);
+        $('#begin').off('click');
+    });
+
+    $('.choose').on('click',function(){
+        var index = $(this).parent('.main').attr('index');
+        $.ajax({
+            url: '/next',
+            data: {
+                index: index,
+                answer: $(this).attr('value')
+            },
+            type: 'POST',
+            success: function(data){
+                score += data.result?1:0;
+                $('.part-'+current).fadeOut(500);
+                if(current < parseInt('<%= items.length -1 %>'))$('.part-'+(++current)).fadeIn(500);
+                else {
+                    $('#result-title').text(title[score]);
+                    $('#result-text').text(result[Math.floor(score/2)]);
+                    $('.result').fadeIn(500);
+                    $('.choose').off('click');
+                }
+                console.log(score)
+            },
+            error: function(){}
+        });
+    });
+
+//    $('#end').on('click',function(){
+//        $('.end').fadeOut(500);
+//        $('.result').fadeIn(500);
+//        $('#end').off('click');
+//    });
+
+    $('#again').on('click',function(){
+        location.href = '/index';
+    });
+    $('#share').on('click',function(){
+        $('#mask').fadeIn(500);
+    });
+    $('#mask').on('click',function(){
+        $('#mask').fadeOut(500);
+    });
+</script>
+
+
+
+
+
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '<%= sign.appId %>',
+
+        jsapi_ticket: '<%= sign.jsapi_ticket %>',
+        nonceStr: '<%= sign.nonceStr %>',
+        timestamp: '<%= sign.timestamp %>',
+        url: '<%= sign.url %>',
+        signature: '<%= sign.signature %>',
+
+        jsApiList: [
+            "onMenuShareTimeline",
+            "onMenuShareAppMessage",
+            "onMenuShareQQ",
+            "onMenuShareWeibo",
+
+            "hideOptionMenu",
+            "showOptionMenu"
+        ]
+    });
+
+    wx.ready(function() {
+        var url = "http://"+location.hostname+":"+location.port;
+        var path = "/index";
+        var shareInfo = {
+            title: '三体',
+            desc: share[Math.floor(score/2)],
+            imgUrl: url+"/img/appIcon.png",
+            link: 'http://zimbra.yueduapi.com:3000/userAuth',
+            success: function () {
+                $('#mask').fadeOut(500);
+            },
+            fail: function(err){
+                //alert(err);
+            }
+        };
+
+        /*分享到朋友圈*/
+        wx.onMenuShareTimeline(shareInfo);
+
+        //获取“分享给朋友”按钮点击状态及自定义分享内容接口
+        wx.onMenuShareAppMessage(shareInfo);
+
+        //获取“分享到QQ”按钮点击状态及自定义分享内容接口
+        wx.onMenuShareQQ(shareInfo);
+
+        //获取“分享到腾讯微博”按钮点击状态及自定义分享内容接口
+        wx.onMenuShareWeibo(shareInfo);
+    });
+
+</script>
+
+<script>
+    function show(){
+        $('#begin').show();
+    }
+</script>
+
+
+
+</body>
+</html>
